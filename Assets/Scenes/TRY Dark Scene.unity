@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 0, g: 0, b: 0, a: 1}
   m_FogMode: 2
-  m_FogDensity: 0.009
+  m_FogDensity: 0.05
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.101548605, g: 0.11027058, b: 0.13207549, a: 1}
@@ -2672,6 +2672,7 @@ GameObject:
   - component: {fileID: 1679453960}
   - component: {fileID: 1679453959}
   - component: {fileID: 1679453961}
+  - component: {fileID: 1679453962}
   m_Layer: 0
   m_Name: PLAYER
   m_TagString: Untagged
@@ -2705,8 +2706,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1679453958}
   m_LocalRotation: {x: -0, y: -0.67104, z: -0, w: 0.7414212}
-  m_LocalPosition: {x: 40.8, y: 154.06, z: -30}
-  m_LocalScale: {x: 3.8908837, y: 3.8908837, z: 3.8908837}
+  m_LocalPosition: {x: 37.06, y: 154.9, z: -24.96}
+  m_LocalScale: {x: 4.956134, y: 4.956134, z: 4.956134}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 960018503}
@@ -2728,13 +2729,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 1679453959}
-  speed: 12
+  speed: 15
   gravity: -9.81
   groundCheck: {fileID: 1336519431}
   groundDistance: 0.4
   groundMask:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &1679453962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1679453958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d63ae9234e53c843b761d6d3652df19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FlashlightLight: {fileID: 1771703176}
+  maxBatteryLife: 100
+  drainSpeed: 0.3
+  currentBatteryLife: 0
 --- !u!1 &1709120181
 GameObject:
   m_ObjectHideFlags: 0
@@ -2976,7 +2993,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1771703176}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.02000004, z: 0}
+  m_LocalPosition: {x: 0, y: -0.063, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3015,10 +3032,10 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 0.89427125, g: 0.9056604, b: 0.6450694, a: 1}
-  m_Intensity: 111
+  m_Intensity: 350
   m_Range: 200
-  m_SpotAngle: 81.142876
-  m_InnerSpotAngle: 28.194937
+  m_SpotAngle: 70.76745
+  m_InnerSpotAngle: 55.284615
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2
@@ -3054,7 +3071,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -3063,7 +3080,7 @@ Light:
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
-  m_ShadowRadius: 0
+  m_ShadowRadius: 0.54
   m_ShadowAngle: 0
 --- !u!1001 &1775526684
 PrefabInstance:
