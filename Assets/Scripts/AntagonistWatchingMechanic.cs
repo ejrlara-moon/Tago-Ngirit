@@ -6,11 +6,17 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 {
     public static AntagonistWatchingMechanic instance;
 
-    [SerializeField] bool isWatching;
     [SerializeField] GameObject Antagonist;
-    [SerializeField] float WatchingTimer = 5f;
-    bool isWatchingTimer;
 
+    [Header("SpawnPoints")]
+    [SerializeField] Transform[] spawnPoints;
+
+
+
+    //Watching variables
+    float maxWatchingTimer = 5f;
+    float currentWatchingTimer;
+    bool isWatchingTimer;
     int appearChance;
 
     void Awake()
@@ -21,39 +27,62 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 
     void Update()
     {
-        if (isWatchingTimer == true && WatchingTimer > 0)
+        if (isWatchingTimer == true && currentWatchingTimer > 0)
         {
-            WatchingTimer -= Time.deltaTime;
-            Debug.Log("TimeRemaining: " + WatchingTimer);
+            currentWatchingTimer -= Time.deltaTime;
+            Debug.Log("TimeRemaining: " + currentWatchingTimer);
         }
-        else if(WatchingTimer <= 0)
+        else if(currentWatchingTimer <= 0)
         {
-            WatchingTimer = 0;
+            currentWatchingTimer = 0;
             if (isWatchingTimer == true)
             {
                 isWatchingTimer = false;
                 ChasePlayer();
+                
             }
         }
     }
 
     public void AntaAppear()
     {
+
+        if (isWatchingTimer || Antagonist.activeSelf)
+        {
+            return; // Do nothing
+        }
+
         appearChance = Random.Range(1, 101);    
 
-        if (appearChance <= 100)
+        if (appearChance <= 50)
         {
+            ChooseWhereSpawn();
             isWatchingTimer = true;
-            Update();
-            //Debug.Log("Hindi ito false alarm at May timer igdi");
-            
+            currentWatchingTimer = maxWatchingTimer;
+
+        }
+        else if(appearChance >= 51)
+        {
+            //This is false alarm
         }
     }
 
     void ChasePlayer()
     {
-        Antagonist.SetActive(true);
+        
         Debug.Log("Hahabolin ka ni Tago-Ngirit");
+    }
+
+
+    void ChooseWhereSpawn()
+    {
+        Antagonist.SetActive(true);
+
+        int spawnIndex = Random.Range(0, spawnPoints.Length);
+
+        Transform randomSpawnPoint = spawnPoints[spawnIndex];
+
+        Antagonist.transform.position = randomSpawnPoint.position;
     }
 
 
