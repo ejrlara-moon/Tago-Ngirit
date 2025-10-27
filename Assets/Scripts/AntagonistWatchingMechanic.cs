@@ -7,19 +7,28 @@ public class AntagonistWatchingMechanic : MonoBehaviour
     public static AntagonistWatchingMechanic instance;
 
     [SerializeField] GameObject Antagonist;
+
     [Header("SpawnPoints")]
     [SerializeField] Transform[] spawnPoints;
 
+
+
     //Watching variables
-    float maxWatchingTimer = 5f;
-    float currentWatchingTimer;
+    float maxWatchingTimer = 10f;
+    public float currentWatchingTimer;
     bool isWatchingTimer;
     int appearChance;
+    int jumpScareChance;
+    bool jumpScare;
+
+    public GameObject jumpScarePanel;
 
     void Awake()
     {
         instance = this;
         Antagonist.SetActive(false);
+        jumpScarePanel.SetActive(false);
+
     }
 
     void Update()
@@ -32,11 +41,21 @@ public class AntagonistWatchingMechanic : MonoBehaviour
         else if (currentWatchingTimer <= 0)
         {
             currentWatchingTimer = 0;
-            if (isWatchingTimer == true)
+            if (isWatchingTimer == true && PlayerRaycast.instance.isHiding == false && jumpScare == false)
             {
                 isWatchingTimer = false;
                 ChasePlayer();
 
+            }
+            else if (PlayerRaycast.instance.isHiding == true && isWatchingTimer == true && jumpScare == true)
+            {
+                jumpScareChance = Random.Range(1, 101);
+                jumpScare = false;
+                isWatchingTimer = false;
+                if (jumpScareChance <= 100)
+                {
+                    jumpScarePanel.SetActive(true);
+                }
             }
         }
     }
@@ -56,11 +75,17 @@ public class AntagonistWatchingMechanic : MonoBehaviour
             ChooseWhereSpawn();
             isWatchingTimer = true;
             currentWatchingTimer = maxWatchingTimer;
+            jumpScare = false;
 
         }
         else if (appearChance >= 51)
         {
+            isWatchingTimer = true;
+            currentWatchingTimer = maxWatchingTimer;
+            jumpScare = true;
             //This is false alarm
+            //must have a indicator that this is a false alarm
+
         }
     }
 
