@@ -50,12 +50,17 @@ public class AntagonistWatchingMechanic : MonoBehaviour
             else if (PlayerRaycast.instance.isHiding == true && isWatchingTimer == true && jumpScare == true)
             {
                 jumpScareChance = Random.Range(1, 101);
-                jumpScare = false;
-                isWatchingTimer = false;
                 if (jumpScareChance <= 100)
                 {
+                    jumpScare = false;
+                    isWatchingTimer = false;
                     jumpScarePanel.SetActive(true);
                 }
+            }
+            else
+            {
+                jumpScare = false;
+                isWatchingTimer = false;
             }
         }
     }
