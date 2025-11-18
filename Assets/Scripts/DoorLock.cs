@@ -6,6 +6,8 @@ public class DoorLock : MonoBehaviour
 {
     // 1. Choose which key unlocks this door in the Inspector
     public ItemType requiredKeyType;
+    public DoorORGates TargetGate;
+    public DoorORGates TargetGate2;
 
     public string doorName = "Locked Door";
     public bool isLocked = true;
@@ -21,6 +23,8 @@ public class DoorLock : MonoBehaviour
     {
         if (!isLocked)
         {
+            TargetGate.DoorisUnlocked();
+            TargetGate2 .DoorisUnlocked();
             OpenDoor();
             return;
         }
@@ -31,6 +35,7 @@ public class DoorLock : MonoBehaviour
             // --- SUCCESS! ---
             Debug.Log($"Unlocked {doorName} with {heldItem.itemName}!");
             isLocked = false;
+            
 
             // This is just an example. You could also play an animation.
             //gameObject.SetActive(false); // "Opens" the door by disabling it
