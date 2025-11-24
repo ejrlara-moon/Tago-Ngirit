@@ -41,7 +41,7 @@ public class Flashlight : MonoBehaviour
             if (currentBatteryLife > 0)
             {
                 currentBatteryLife -= drainSpeed * Time.deltaTime;
-                Debug.Log(currentBatteryLife);
+                //Debug.Log(currentBatteryLife);
             }
             else
             {
