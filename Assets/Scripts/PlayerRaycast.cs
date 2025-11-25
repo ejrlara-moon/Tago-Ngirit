@@ -39,6 +39,7 @@ public class PlayerRaycast : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.E))
             {
                 StopHiding();
+                //AntagonistWatchingMechanic.instance.PlayerisHiding = false;
             }
 
             // We are hiding, so stop here and don't run any other logic this frame.
@@ -116,7 +117,10 @@ public class PlayerRaycast : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
+                    //AntagonistWatchingMechanic.instance.PlayerisHiding = true;
+                    //print("set the PlayerisHiding to true");
                     StartHiding(spot);
+                    
                 }
                 return;
             }
@@ -180,6 +184,7 @@ public class PlayerRaycast : MonoBehaviour
     void StartHiding(HidingSpot spot)
     {
         isHiding = true;
+        
         currentSpot = spot;
 
         // 1. This stops WALKING and MOUSE LOOK
