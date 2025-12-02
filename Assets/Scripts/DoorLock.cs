@@ -13,6 +13,8 @@ public class DoorLock : MonoBehaviour
     public bool isLocked = true;
     Rigidbody rb;
 
+    int stoneLife = 3;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -35,7 +37,11 @@ public class DoorLock : MonoBehaviour
             // --- SUCCESS! ---
             Debug.Log($"Unlocked {doorName} with {heldItem.itemName}!");
             isLocked = false;
-            
+
+            if(heldItem.itemName == "Stone")
+            {
+                Debug.Log("Stone is held");
+            }
 
             // This is just an example. You could also play an animation.
             //gameObject.SetActive(false); // "Opens" the door by disabling it

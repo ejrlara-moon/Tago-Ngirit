@@ -7,24 +7,33 @@ public class AntagonistWatchingMechanic : MonoBehaviour
     public static AntagonistWatchingMechanic instance;
 
     [SerializeField] GameObject Antagonist;
+    float antagonistSpeedPanggulat = 50f;
+    float antagonistAcelPanggulat = 35f;
+    
 
     [Header("SpawnPoints")]
     [SerializeField] Transform[] spawnPoints;
 
     NavMeshAgent enemyAgent;
     Transform playerTransform;
-    bool isChasingPlayer = false;
+    public bool isChasingPlayer = false;
 
     //Watching variables
     float maxWatchingTimer = 5f;
     float currentWatchingTimer;
-    bool isWatchingTimer;
+    public bool isWatchingTimer;
     int appearChance;
     int jumpScareChance;
     bool jumpScare;
 
-
     public GameObject jumpScarePanel;
+
+    [Header("Panggulat Variables")]
+    [SerializeField] Transform pointA;
+    [SerializeField] Transform pointB;
+
+    [Header("MiniJumpScares Variables")]
+    bool miniJumpScare = false;
 
     void Awake()
     {
@@ -84,9 +93,6 @@ public class AntagonistWatchingMechanic : MonoBehaviour
             }
             
         }
-
-        
-
     }
 
     public void AntaAppear()
@@ -157,5 +163,15 @@ public class AntagonistWatchingMechanic : MonoBehaviour
         }
     }
 
+    public void PanggulatEngage()
+    {
+        Antagonist.transform.position = pointA.position;
+        enemyAgent.speed = antagonistSpeedPanggulat;
+        enemyAgent.acceleration = antagonistAcelPanggulat;
+        Antagonist.SetActive(true);
+        
+        enemyAgent.SetDestination(pointB.position);
 
+        
+    }
 }
