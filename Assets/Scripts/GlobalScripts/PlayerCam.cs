@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerCam : MonoBehaviour
 {
+    public bool IsControlledExternally { get; set; }
+
     public float sensX;
     public float sensY;
 
@@ -21,6 +23,11 @@ public class PlayerCam : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (IsControlledExternally)
+        {
+            return;
+        }
+
         float mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensX;
         float mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensY;
 

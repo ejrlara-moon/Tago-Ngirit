@@ -7,6 +7,7 @@ public class CodeLock : MonoBehaviour
 {
     public static CodeLock Instance;
 
+    bool isInputing;
     public GameObject inputPanel;
     public TMP_InputField codeInput;
     [SerializeField] string correctCode;
@@ -36,8 +37,9 @@ public class CodeLock : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (isInputing && Input.GetKeyDown(KeyCode.Escape))
         {
+            isInputing = false;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             inputPanel.SetActive(false);
@@ -97,6 +99,7 @@ public class CodeLock : MonoBehaviour
 
     public void OpenInputPanel()
     {
+        isInputing = true;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         inputPanel.SetActive(true);

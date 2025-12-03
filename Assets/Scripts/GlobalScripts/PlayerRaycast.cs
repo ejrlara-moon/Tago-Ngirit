@@ -71,7 +71,6 @@ public class PlayerRaycast : MonoBehaviour
         {
             if (hitInfo.collider.CompareTag("CodeLock"))
             {
-                Debug.Log("Hit the lock that need code");
                 //interactionText.text = "Press E to enter code";
                 //interactionText.gameObject.SetActive(true);
                 
@@ -80,6 +79,17 @@ public class PlayerRaycast : MonoBehaviour
                     CodeLock.Instance.OpenInputPanel();
                 }
 
+            }
+        }
+
+        if(Physics.Raycast(ray, out hitInfo, interactionDistance))
+        {
+            if (hitInfo.collider.CompareTag("Monitor"))
+            {                
+
+                if (Input.GetKeyDown(KeyCode.E)) {
+                    PCInteractions.Instance.EngageToPC();
+                }
             }
         }
 
