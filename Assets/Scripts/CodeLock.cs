@@ -9,7 +9,10 @@ public class CodeLock : MonoBehaviour
 
     public GameObject inputPanel;
     public TMP_InputField codeInput;
-    string correctCode = "1234";
+    [SerializeField] string correctCode;
+    int[] randomCode = new int[4];
+    [SerializeField] TextMeshPro code1, code2, code3, code4;
+    
 
     public DoorORGates TargetGate;
     public DoorORGates TargetGate2;
@@ -27,6 +30,8 @@ public class CodeLock : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
+
+        GenerateRandomCodes();
     }
 
     private void Update()
@@ -38,6 +43,22 @@ public class CodeLock : MonoBehaviour
             inputPanel.SetActive(false);
             //Time.timeScale = 1.0f;
         }
+    }
+
+    void GenerateRandomCodes()
+    {
+        for (int i = 0; i < randomCode.Length; i++) {
+
+            randomCode[i] = Random.Range(0, 10);
+        }
+
+        correctCode = string.Join("",randomCode);
+        Debug.Log("Random Code: " + correctCode);
+
+        code1.text = randomCode[0].ToString();
+        code2.text = randomCode[1].ToString();
+        code3.text = randomCode[2].ToString();
+        code4.text = randomCode[3].ToString();
     }
 
     public void TryUnlockCode()
