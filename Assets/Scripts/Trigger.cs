@@ -6,7 +6,7 @@ public class Trigger : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && AntagonistWatchingMechanic.instance.isWatchingTimer == false  && AntagonistWatchingMechanic.instance.isChasingPlayer == false)
         {
             Debug.Log("Player entered trigger zone");
             AntagonistWatchingMechanic.instance.AntaAppear();
