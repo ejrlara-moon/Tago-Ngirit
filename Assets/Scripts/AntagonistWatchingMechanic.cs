@@ -1,27 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class AntagonistWatchingMechanic : MonoBehaviour
 {
     public static AntagonistWatchingMechanic instance;
 
     [SerializeField] GameObject Antagonist;
+    float antagonistSpeedPanggulat = 50f;
+    float antagonistAcelPanggulat = 35f;
+    
 
     [Header("SpawnPoints")]
     [SerializeField] Transform[] spawnPoints;
 
-
+    NavMeshAgent enemyAgent;
+    Transform playerTransform;
+    public bool isChasingPlayer = false;
 
     //Watching variables
-    float maxWatchingTimer = 10f;
-    public float currentWatchingTimer;
-    bool isWatchingTimer;
+    float maxWatchingTimer = 5f;
+    float currentWatchingTimer;
+    public bool isWatchingTimer;
     int appearChance;
     int jumpScareChance;
     bool jumpScare;
 
     public GameObject jumpScarePanel;
+
+    [Header("Panggulat Variables")]
+    [SerializeField] Transform pointA;
+    [SerializeField] Transform pointB;
+
+    [Header("MiniJumpScares Variables")]
+    bool miniJumpScare = false;
 
     void Awake()
     {
@@ -29,14 +41,32 @@ public class AntagonistWatchingMechanic : MonoBehaviour
         Antagonist.SetActive(false);
         jumpScarePanel.SetActive(false);
 
+        enemyAgent = Antagonist.GetComponent<NavMeshAgent>();
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            playerTransform = playerObj.transform;
+        }
+        else
+        {
+            Debug.LogError("Player NOT found! Make sure your Player has the tag 'Player'.");
+        }
+
     }
 
     void Update()
     {
+        if (isChasingPlayer && playerTransform != null && Antagonist.activeSelf)
+        {
+            enemyAgent.SetDestination(playerTransform.position);
+            
+        }
+
         if (isWatchingTimer == true && currentWatchingTimer > 0)
         {
             currentWatchingTimer -= Time.deltaTime;
-            Debug.Log("TimeRemaining: " + currentWatchingTimer);
+            //Debug.Log("TimeRemaining: " + currentWatchingTimer);
         }
         else if (currentWatchingTimer <= 0)
         {
@@ -44,29 +74,30 @@ public class AntagonistWatchingMechanic : MonoBehaviour
             if (isWatchingTimer == true && PlayerRaycast.instance.isHiding == false && jumpScare == false)
             {
                 isWatchingTimer = false;
+
                 ChasePlayer();
 
+                
             }
             else if (PlayerRaycast.instance.isHiding == true && isWatchingTimer == true && jumpScare == true)
             {
+                jumpScare = false;
+                isWatchingTimer = false;
+
                 jumpScareChance = Random.Range(1, 101);
                 if (jumpScareChance <= 100)
                 {
-                    jumpScare = false;
-                    isWatchingTimer = false;
                     jumpScarePanel.SetActive(true);
+
                 }
             }
-            else
-            {
-                jumpScare = false;
-                isWatchingTimer = false;
-            }
+            
         }
     }
 
     public void AntaAppear()
     {
+        isChasingPlayer = false;
 
         if (isWatchingTimer || Antagonist.activeSelf)
         {
@@ -75,7 +106,7 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 
         appearChance = Random.Range(1, 101);
 
-        if (appearChance <= 50)
+        if (appearChance <= 100)
         {
             ChooseWhereSpawn();
             isWatchingTimer = true;
@@ -83,12 +114,13 @@ public class AntagonistWatchingMechanic : MonoBehaviour
             jumpScare = false;
 
         }
-        else if (appearChance >= 51)
+        else if (appearChance >= 101)
         {
+            //This is false alarm
             isWatchingTimer = true;
             currentWatchingTimer = maxWatchingTimer;
             jumpScare = true;
-            //This is false alarm
+
             //must have a indicator that this is a false alarm
 
         }
@@ -97,7 +129,17 @@ public class AntagonistWatchingMechanic : MonoBehaviour
     void ChasePlayer()
     {
 
-        Debug.Log("Hahabolin ka ni Tago-Ngirit");
+        Debug.Log("Tago-Ngirit will chase the player");
+
+        
+            isChasingPlayer = true;
+        
+
+        if (enemyAgent != null)
+        {
+            enemyAgent.isStopped = false;
+        }
+
     }
 
 
@@ -109,6 +151,27 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 
         Transform randomSpawnPoint = spawnPoints[spawnIndex];
 
-        Antagonist.transform.position = randomSpawnPoint.position;
+        //Antagonist.transform.position = randomSpawnPoint.position;
+
+        if (enemyAgent != null)
+        {
+            enemyAgent.Warp(randomSpawnPoint.position);
+        }
+        else
+        {
+            Antagonist.transform.position = randomSpawnPoint.position;
+        }
+    }
+
+    public void PanggulatEngage()
+    {
+        Antagonist.transform.position = pointA.position;
+        enemyAgent.speed = antagonistSpeedPanggulat;
+        enemyAgent.acceleration = antagonistAcelPanggulat;
+        Antagonist.SetActive(true);
+        
+        enemyAgent.SetDestination(pointB.position);
+
+        
     }
 }

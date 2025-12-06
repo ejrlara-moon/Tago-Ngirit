@@ -14,11 +14,11 @@ public class DollAI : MonoBehaviour
         if (dollRenderer.isVisible)
         {
             // Doll is on camera — STOP
-            print("true");
+            //print("true");
             //return;
         } else
         {
-print("false");
+        //print("false");
         }
         // Doll is NOT visible — MOVE
         //transform.position += transform.forward * moveSpeed * Time.deltaTime;

@@ -1,13 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Burst.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.ProBuilder.Shapes;
 
 public class PlayerRaycast : MonoBehaviour
 {
     public static PlayerRaycast instance;
 
     [SerializeField] LayerMask interactableLayermask;
+    [SerializeField] LayerMask codeLockLayermask;
     public float interactionDistance = 3f;
 
     public CharacterController playerController;
@@ -39,6 +43,7 @@ public class PlayerRaycast : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.E))
             {
                 StopHiding();
+                //AntagonistWatchingMechanic.instance.PlayerisHiding = false;
             }
 
             // We are hiding, so stop here and don't run any other logic this frame.
@@ -62,6 +67,22 @@ public class PlayerRaycast : MonoBehaviour
         Ray ray = new Ray(transform.position, transform.TransformDirection(Vector3.forward));
         RaycastHit hitInfo;
 
+        if (Physics.Raycast(ray, out hitInfo, interactionDistance, codeLockLayermask))
+        {
+            if (hitInfo.collider.CompareTag("CodeLock"))
+            {
+                Debug.Log("Hit the lock that need code");
+                //interactionText.text = "Press E to enter code";
+                //interactionText.gameObject.SetActive(true);
+                
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    CodeLock.Instance.OpenInputPanel();
+                }
+
+            }
+        }
+
         if (Physics.Raycast(ray, out hitInfo, interactionDistance, interactableLayermask))
         {
             // We hit something on the Interactable layer.
@@ -73,6 +94,8 @@ public class PlayerRaycast : MonoBehaviour
             {
                 interactionText.text = $"Press 'E' to pick up {item.itemName}";
                 interactionText.gameObject.SetActive(true);
+
+                
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
@@ -116,7 +139,10 @@ public class PlayerRaycast : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
+                    //AntagonistWatchingMechanic.instance.PlayerisHiding = true;
+                    //print("set the PlayerisHiding to true");
                     StartHiding(spot);
+                    
                 }
                 return;
             }
@@ -180,6 +206,7 @@ public class PlayerRaycast : MonoBehaviour
     void StartHiding(HidingSpot spot)
     {
         isHiding = true;
+        
         currentSpot = spot;
 
         // 1. This stops WALKING and MOUSE LOOK
@@ -242,5 +269,9 @@ public class PlayerRaycast : MonoBehaviour
 
         currentSpot = null;
         interactionText.gameObject.SetActive(false);
+
+        
     }
+
+    
 }

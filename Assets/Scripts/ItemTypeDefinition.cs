@@ -4,5 +4,7 @@ public enum ItemType
     LRH302,
     LRH301,
     RedPotion,
-    BluePotion
+    BluePotion,
+    Stone,
+    AntingAnting
 }
