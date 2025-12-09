@@ -84,10 +84,6 @@ public class TV207 : MonoBehaviour
             Cursor.visible = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            WordPicker();
-        }
     }
 
     public void OpenInputPanel()
