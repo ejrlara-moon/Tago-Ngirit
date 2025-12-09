@@ -6,5 +6,8 @@ public enum ItemType
     RedPotion,
     BluePotion,
     Stone,
-    AntingAnting
+    AntingAnting,
+    LibraryKey,
+    FirstKey,
+    LastKey
 }

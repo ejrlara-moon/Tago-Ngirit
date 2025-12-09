@@ -73,215 +73,311 @@ public class PlayerRaycast : MonoBehaviour
             {
                 //interactionText.text = "Press E to enter code";
                 //interactionText.gameObject.SetActive(true);
-                
+
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     CodeLock.Instance.OpenInputPanel();
                 }
 
             }
+
+            if (hitInfo.collider.CompareTag("CodeLockForFacultyRoom"))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    TV207.Instance.OpenInputPanel();
+                }
+            }
         }
 
-        if(Physics.Raycast(ray, out hitInfo, interactionDistance))
+        if (Physics.Raycast(ray, out hitInfo, interactionDistance))
         {
             if (hitInfo.collider.CompareTag("Monitor"))
-            {                
-
-                if (Input.GetKeyDown(KeyCode.E)) {
+            {
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC1 == false)
+                {
                     PCInteractions.Instance.EngageToPC();
                 }
             }
-        }
 
-        if (Physics.Raycast(ray, out hitInfo, interactionDistance, interactableLayermask))
-        {
-            // We hit something on the Interactable layer.
-            // But what is it? An item, a door, or a hiding spot?
-
-            // check if its item
-            InteractableItem item = hitInfo.collider.GetComponent<InteractableItem>();
-            if (item != null && heldItemScript == null) // We can only pick up if hand is empty
+            if (hitInfo.collider.CompareTag("Monitor2"))
             {
-                interactionText.text = $"Press 'E' to pick up {item.itemName}";
-                interactionText.gameObject.SetActive(true);
-
-                
-
-                if (Input.GetKeyDown(KeyCode.E))
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC2 == false)
                 {
-                    PickUpItem(item);
+                    PCInteractions.Instance.EngageToPC2();
                 }
-                return;
             }
 
-            DoorLock door = hitInfo.collider.GetComponent<DoorLock>();
-            if (door != null)
+            if (hitInfo.collider.CompareTag("Monitor3"))
             {
-                // --- HOVER LOGIC ---
-                if (door.isLocked)
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC3 == false)
                 {
-                    // It's locked. Get the key name from the enum or ItemTypeDefinition.
-                    string requiredKeyName = door.requiredKeyType.ToString();
-                    interactionText.text = $"{door.doorName} is locked. Requires {requiredKeyName}.";
+                    PCInteractions.Instance.EngageToPC3();
                 }
-                else
-                {
-                    // It's already unlocked.
-                    interactionText.text = $"Press 'E' to open {door.doorName}";
-                }
-
-                interactionText.gameObject.SetActive(true);
-
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    // try to unlock or open the door when you press 'E'.
-                    door.TryUnlock(heldItemScript);
-                }
-                return; // Stop here
             }
 
-            // --- Check if it's a HIDING SPOT ---
-            HidingSpot spot = hitInfo.collider.GetComponent<HidingSpot>();
-            if (spot != null)
+            if (hitInfo.collider.CompareTag("Monitor4"))
             {
-                interactionText.text = $"Press 'E' to hide in {spot.spotName}";
-                interactionText.gameObject.SetActive(true);
-
-                if (Input.GetKeyDown(KeyCode.E))
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
                 {
-                    //AntagonistWatchingMechanic.instance.PlayerisHiding = true;
-                    //print("set the PlayerisHiding to true");
-                    StartHiding(spot);
-                    
+                    PCInteractions.Instance.EngageToPC4();
                 }
-                return;
+            }
+
+            if (hitInfo.collider.CompareTag("205CircuitBreaker"))
+            {
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
+                {
+                    CircuitBreakers.instance.Activate205CB();
+                }
+            }
+
+            if (hitInfo.collider.CompareTag("201CircuitBreaker"))
+            {
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
+                {
+                    CircuitBreakers.instance.Activate201CB();
+                }
+            }
+
+            if (hitInfo.collider.CompareTag("ICTCircuitBreaker"))
+            {
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
+                {
+                    CircuitBreakers.instance.ActivateICTCB();
+                }
+            }
+
+            if (hitInfo.collider.CompareTag("ARCircuitBreaker"))
+            {
+                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
+                {
+                    CircuitBreakers.instance.ActivateARCB();
+                }
+
+
+
+            }
+
+            if (Physics.Raycast(ray, out hitInfo, interactionDistance, interactableLayermask))
+            {
+                // We hit something on the Interactable layer.
+                // But what is it? An item, a door, or a hiding spot?
+
+                // check if its item
+                InteractableItem item = hitInfo.collider.GetComponent<InteractableItem>();
+                if (item != null && heldItemScript == null) // We can only pick up if hand is empty
+                {
+                    interactionText.text = $"Press 'E' to pick up {item.itemName}";
+                    interactionText.gameObject.SetActive(true);
+
+
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        PickUpItem(item);
+                    }
+                    return;
+                }
+
+                DoorLock door = hitInfo.collider.GetComponent<DoorLock>();
+                if (door != null)
+                {
+                    // --- HOVER LOGIC ---
+                    if (door.isLocked)
+                    {
+                        // It's locked. Get the key name from the enum or ItemTypeDefinition.
+                        string requiredKeyName = door.requiredKeyType.ToString();
+                        interactionText.text = $"{door.doorName} is locked. Requires {requiredKeyName}.";
+                    }
+                    else
+                    {
+                        // It's already unlocked.
+                        interactionText.text = $"Press 'E' to open {door.doorName}";
+                    }
+
+                    interactionText.gameObject.SetActive(true);
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        // try to unlock or open the door when you press 'E'.
+                        door.TryUnlock(heldItemScript);
+                    }
+                    return; // Stop here
+                }
+
+                FirstAndLastLock FLLock = hitInfo.collider.GetComponent<FirstAndLastLock>();
+                if (FLLock != null)
+                {
+                    // --- HOVER LOGIC ---
+                    if (FLLock.isLocked)
+                    {
+                        // It's locked. Get the key name from the enum or ItemTypeDefinition.
+                        string requiredKeyName = FLLock.requiredKeyType.ToString();
+                        interactionText.text = $"{FLLock.doorName} is locked. Requires {requiredKeyName}.";
+                    }
+                    else
+                    {
+                        // It's already unlocked.
+                        interactionText.text = $"Press 'E' to open {FLLock.doorName}";
+                    }
+
+                    interactionText.gameObject.SetActive(true);
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        // try to unlock or open the door when you press 'E'.
+                        FLLock.TryUnlock(heldItemScript);
+                    }
+                    return; // Stop here
+                }
+
+                // --- Check if it's a HIDING SPOT ---
+                HidingSpot spot = hitInfo.collider.GetComponent<HidingSpot>();
+                if (spot != null)
+                {
+                    interactionText.text = $"Press 'E' to hide in {spot.spotName}";
+                    interactionText.gameObject.SetActive(true);
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        //AntagonistWatchingMechanic.instance.PlayerisHiding = true;
+                        //print("set the PlayerisHiding to true");
+                        StartHiding(spot);
+
+                    }
+                    return;
+                }
+            }
+
+            // If player is not looking at anything
+            interactionText.gameObject.SetActive(false);
+        }
+
+
+        void PickUpItem(InteractableItem itemToPickUp)
+        {
+            // Store the script
+            heldItemScript = itemToPickUp;
+
+            // Disable physics
+            Rigidbody rb = heldItemScript.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+            }
+
+            Collider col = heldItemScript.GetComponent<Collider>();
+            if (col != null)
+            {
+                col.enabled = false;
+            }
+
+            // Parent and snap to hold point
+            heldItemScript.transform.SetParent(holdPoint);
+            heldItemScript.transform.localPosition = Vector3.zero;
+            heldItemScript.transform.localRotation = Quaternion.identity;
+
+            interactionText.gameObject.SetActive(false);
+
+            
+        }
+
+
+        void DropItem()
+        {
+            // Un-parent
+            heldItemScript.transform.SetParent(null);
+
+            // Re-enable physics
+            Rigidbody rb = heldItemScript.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.AddForce(transform.forward * 5f, ForceMode.Impulse);
+            }
+
+            Collider col = heldItemScript.GetComponent<Collider>();
+            if (col != null)
+            {
+                col.enabled = true;
+            }
+
+            // Forget the item
+            heldItemScript = null;
+        }
+
+        void StartHiding(HidingSpot spot)
+        {
+            isHiding = true;
+
+            currentSpot = spot;
+
+            // 1. This stops WALKING and MOUSE LOOK
+            if (playerMovement != null)
+            {
+                playerMovement.enabled = false;
+            }
+
+            //if (playerCam != null)
+            //{
+            //    playerCam.enabled = false;
+            //}
+
+            if (playerController != null)
+            {
+                // Disable the controller to allow teleporting
+                playerController.enabled = false;
+
+                // Move the CONTROLLER (the body) to the hide point
+                playerController.transform.position = spot.hidePoint.position;
+                playerController.transform.rotation = spot.hidePoint.rotation;
+
+            }
+
+            // Hide the held item
+            if (heldItemScript != null)
+            {
+                heldItemScript.gameObject.SetActive(false);
             }
         }
 
-        // If player is not looking at anything
-        interactionText.gameObject.SetActive(false);
+        void StopHiding()
+        {
+            isHiding = false;
+
+            // Move player BODY to the exit point
+            if (playerController != null)
+            {
+                playerController.enabled = false; // Must be disabled to teleport
+                playerController.transform.position = currentSpot.exitPoint.position;
+                // playerController.enabled = true; // Re-enables gravity/collision
+            }
+
+            // Re-enable WALKING and MOUSE LOOK
+            if (playerMovement != null)
+            {
+                playerMovement.enabled = true;
+            }
+
+            if (playerCam != null)
+            {
+                playerCam.enabled = true;
+            }
+
+            // Un-hide the held item
+            if (heldItemScript != null)
+            {
+                heldItemScript.gameObject.SetActive(true);
+            }
+
+            currentSpot = null;
+            interactionText.gameObject.SetActive(false);
+
+
+        }
+
+
     }
 
-
-    void PickUpItem(InteractableItem itemToPickUp)
-    {
-        // Store the script
-        heldItemScript = itemToPickUp;
-
-        // Disable physics
-        Rigidbody rb = heldItemScript.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = true;
-        }
-
-        Collider col = heldItemScript.GetComponent<Collider>();
-        if (col != null)
-        {
-            col.enabled = false;
-        }
-
-        // Parent and snap to hold point
-        heldItemScript.transform.SetParent(holdPoint);
-        heldItemScript.transform.localPosition = Vector3.zero;
-        heldItemScript.transform.localRotation = Quaternion.identity;
-
-        interactionText.gameObject.SetActive(false);
-    }
-
-
-    void DropItem()
-    {
-        // Un-parent
-        heldItemScript.transform.SetParent(null);
-
-        // Re-enable physics
-        Rigidbody rb = heldItemScript.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = false;
-            rb.AddForce(transform.forward * 5f, ForceMode.Impulse);
-        }
-
-        Collider col = heldItemScript.GetComponent<Collider>();
-        if (col != null)
-        {
-            col.enabled = true;
-        }
-
-        // Forget the item
-        heldItemScript = null;
-    }
-
-    void StartHiding(HidingSpot spot)
-    {
-        isHiding = true;
-        
-        currentSpot = spot;
-
-        // 1. This stops WALKING and MOUSE LOOK
-        if (playerMovement != null)
-        {
-            playerMovement.enabled = false;
-        }
-
-        //if (playerCam != null)
-        //{
-        //    playerCam.enabled = false;
-        //}
-
-        if (playerController != null)
-        {
-            // Disable the controller to allow teleporting
-            playerController.enabled = false;
-
-            // Move the CONTROLLER (the body) to the hide point
-            playerController.transform.position = spot.hidePoint.position;
-            playerController.transform.rotation = spot.hidePoint.rotation;
-
-        }
-
-        // Hide the held item
-        if (heldItemScript != null)
-        {
-            heldItemScript.gameObject.SetActive(false);
-        }
-    }
-
-    void StopHiding()
-    {
-        isHiding = false;
-
-        // Move player BODY to the exit point
-        if (playerController != null)
-        {
-            playerController.enabled = false; // Must be disabled to teleport
-            playerController.transform.position = currentSpot.exitPoint.position;
-           // playerController.enabled = true; // Re-enables gravity/collision
-        }
-
-        // Re-enable WALKING and MOUSE LOOK
-        if (playerMovement != null)
-        {
-            playerMovement.enabled = true;
-        }
-
-        if (playerCam != null)
-        {
-            playerCam.enabled = true;
-        }
-
-        // Un-hide the held item
-        if (heldItemScript != null)
-        {
-            heldItemScript.gameObject.SetActive(true);
-        }
-
-        currentSpot = null;
-        interactionText.gameObject.SetActive(false);
-
-        
-    }
-
-    
 }

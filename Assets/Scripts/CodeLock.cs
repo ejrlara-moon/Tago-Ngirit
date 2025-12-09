@@ -13,12 +13,12 @@ public class CodeLock : MonoBehaviour
     [SerializeField] string correctCode;
     int[] randomCode = new int[4];
     [SerializeField] TextMeshPro code1, code2, code3, code4;
-    
+    [SerializeField] PlayerMovement playerMovement;
 
     public DoorORGates TargetGate;
     public DoorORGates TargetGate2;
 
-    public bool isLocked = true;
+    bool isLocked = true;
 
     Rigidbody rb;
 
@@ -43,7 +43,7 @@ public class CodeLock : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             inputPanel.SetActive(false);
-            //Time.timeScale = 1.0f;
+            if (playerMovement != null) playerMovement.enabled = true;
         }
     }
 
@@ -71,7 +71,8 @@ public class CodeLock : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             inputPanel.SetActive(false);
-            
+            if (playerMovement != null) playerMovement.enabled = true;
+
             return;
         }
 
@@ -88,6 +89,7 @@ public class CodeLock : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             inputPanel.SetActive(false);
+            if (playerMovement != null) playerMovement.enabled = true;
         }
         else
         {
@@ -103,7 +105,7 @@ public class CodeLock : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         inputPanel.SetActive(true);
-        //Time.timeScale = 0;
+        if (playerMovement != null) playerMovement.enabled = false;
     }
 
     void OpenDoorCode()

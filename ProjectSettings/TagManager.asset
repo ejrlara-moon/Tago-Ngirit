@@ -6,6 +6,14 @@ TagManager:
   tags:
   - CodeLock
   - Monitor
+  - Monitor2
+  - Monitor3
+  - Monitor4
+  - 205CircuitBreaker
+  - 201CircuitBreaker
+  - ICTCircuitBreaker
+  - ARCircuitBreaker
+  - CodeLockForFacultyRoom
   layers:
   - Default
   - TransparentFX
