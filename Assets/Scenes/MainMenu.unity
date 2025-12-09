@@ -226,12 +226,12 @@ GameObject:
   - component: {fileID: 395027531}
   - component: {fileID: 395027530}
   m_Layer: 5
-  m_Name: Image
+  m_Name: ProductionLogo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &395027529
 RectTransform:
   m_ObjectHideFlags: 0
@@ -241,7 +241,7 @@ RectTransform:
   m_GameObject: {fileID: 395027528}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.15323406, y: 0.15323406, z: 0.15323406}
+  m_LocalScale: {x: 0.15865855, y: 0.15865855, z: 0.15865855}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 926288524}
