@@ -9,5 +9,8 @@ public enum ItemType
     AntingAnting,
     LibraryKey,
     FirstKey,
-    LastKey
+    LastKey,
+    FirstIpin,
+    SecondIpin,
+    ThirdIpin
 }

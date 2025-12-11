@@ -15,6 +15,7 @@ TagManager:
   - ARCircuitBreaker
   - CodeLockForFacultyRoom
   - FirstKeyLock
+  - Lamesa
   layers:
   - Default
   - TransparentFX
