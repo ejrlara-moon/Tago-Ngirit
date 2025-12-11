@@ -52,7 +52,8 @@ public class PlayerRaycast : MonoBehaviour
             Ray checkRay = new Ray(transform.position, transform.TransformDirection(Vector3.forward));
 
             // Drop if NOT looking at any interactable
-            if (!Physics.Raycast(checkRay, interactionDistance, interactableLayermask))
+            // NOTE: Using interactionDistance here is correct for checking if we can safely drop.
+            if (!Physics.Raycast(checkRay, interactionDistance))
             {
                 DropItem();
                 return;
@@ -67,114 +68,16 @@ public class PlayerRaycast : MonoBehaviour
         {
             Collider hitCollider = hitInfo.collider;
 
-            // --- A. TAG-BASED INTERACTIONS (Code Locks, Monitors, Circuit Breakers) ---
-
-            if (hitCollider.CompareTag("CodeLock"))
+            // ** (OPTIONAL) Force Field Check **
+            // NOTE: This check runs every frame, regardless of what the raycast hits.
+            if (IsHoldingItem(ItemType.FirstKey) && Wherefirstkey.instance.disableForceField == false)
             {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    CodeLock.Instance.OpenInputPanel();
-                }
-                return;
+                Wherefirstkey.instance.ActivateForceFieild();
             }
+            // **********************************
 
-            if (hitCollider.CompareTag("CodeLockForFacultyRoom"))
-            {
-                if (Input.GetKeyDown(KeyCode.E))
-                {
-                    TV207.Instance.OpenInputPanel();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("Monitor"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC1 == false)
-                {
-                    PCInteractions.Instance.EngageToPC();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("Monitor2"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC2 == false)
-                {
-                    PCInteractions.Instance.EngageToPC2();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("Monitor3"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC3 == false)
-                {
-                    PCInteractions.Instance.EngageToPC3();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("Monitor4"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
-                {
-                    PCInteractions.Instance.EngageToPC4();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("205CircuitBreaker"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
-                {
-                    CircuitBreakers.instance.Activate205CB();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("201CircuitBreaker"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
-                {
-                    CircuitBreakers.instance.Activate201CB();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("ICTCircuitBreaker"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
-                {
-                    CircuitBreakers.instance.ActivateICTCB();
-                }
-                return;
-            }
-
-            if (hitCollider.CompareTag("ARCircuitBreaker"))
-            {
-                if (Input.GetKeyDown(KeyCode.E) && PCInteractions.Instance.isPC4 == false)
-                {
-                    CircuitBreakers.instance.ActivateARCB();
-                }
-                return;
-            }
-
-            
-           
-            
-            if (IsHoldingItem(ItemType.FirstKey))
-            {
-                //Debug.Log("Player is holding FirstKey");
-                Test.Instance.ActivateCube();
-            }
-                
-
-                
-            
-
-            // --- C. COMPONENT-BASED INTERACTIONS (Items, Doors, Hiding Spots) ---
-
-            // 1. Check if its item to pick up (only if hand is empty)
+            // --- A. PRIORITY 1: GENERIC ITEM PICKUP (FIXED) ---
+            // MUST run first to allow picking up items before checking other interactions.
             InteractableItem item = hitCollider.GetComponent<InteractableItem>();
             if (item != null && heldItemScript == null)
             {
@@ -185,11 +88,152 @@ public class PlayerRaycast : MonoBehaviour
                 {
                     PickUpItem(item);
                 }
+                return; // Interaction handled (hover or pickup), stop here.
+            }
+
+
+            // --- B. PRIORITY 2: TAG-BASED INTERACTIONS (Locks, Monitors, Placement Spots) ---
+
+            // 1. Code Lock Logic (Now includes text)
+            if (hitCollider.CompareTag("CodeLock"))
+            {
+                interactionText.text = "Press 'E' to use Keypad";
+                interactionText.gameObject.SetActive(true);
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    CodeLock.Instance.OpenInputPanel();
+                }
                 return;
             }
 
-            // 2. Check if it's a regular Door
-            // FIX: Removed redundant .collider
+            // 2. Code Lock For Faculty Room Logic (Now includes text)
+            if (hitCollider.CompareTag("CodeLockForFacultyRoom"))
+            {
+                interactionText.text = "Press 'E' to use TV Keypad";
+                interactionText.gameObject.SetActive(true);
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    TV207.Instance.OpenInputPanel();
+                }
+                return;
+            }
+
+            // 3. Monitor Checks (Now includes text)
+            if (hitCollider.CompareTag("Monitor") || hitCollider.CompareTag("Monitor2") ||
+                hitCollider.CompareTag("Monitor3") || hitCollider.CompareTag("Monitor4"))
+            {
+                // Determine which PC instance to check/engage based on the tag
+                PCInteractions pcInstance = PCInteractions.Instance; // Assuming PCInteractions handles logic for all 4
+
+                if (hitCollider.CompareTag("Monitor") && !pcInstance.isPC1 ||
+                    hitCollider.CompareTag("Monitor2") && !pcInstance.isPC2 ||
+                    hitCollider.CompareTag("Monitor3") && !pcInstance.isPC3 ||
+                    hitCollider.CompareTag("Monitor4") && !pcInstance.isPC4)
+                {
+                    interactionText.text = "Press 'E' to use PC";
+                    interactionText.gameObject.SetActive(true);
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        if (hitCollider.CompareTag("Monitor")) pcInstance.EngageToPC();
+                        else if (hitCollider.CompareTag("Monitor2")) pcInstance.EngageToPC2();
+                        else if (hitCollider.CompareTag("Monitor3")) pcInstance.EngageToPC3();
+                        else if (hitCollider.CompareTag("Monitor4")) pcInstance.EngageToPC4();
+                    }
+                }
+                else if (hitCollider.CompareTag("Monitor") && pcInstance.isPC1 ||
+                         hitCollider.CompareTag("Monitor2") && pcInstance.isPC2 ||
+                         hitCollider.CompareTag("Monitor3") && pcInstance.isPC3 ||
+                         hitCollider.CompareTag("Monitor4") && pcInstance.isPC4)
+                {
+                    // Already engaged, perhaps show a different message or skip
+                    interactionText.text = "PC is in use";
+                    interactionText.gameObject.SetActive(true);
+                }
+                return;
+            }
+
+
+            // 4. Circuit Breaker Checks (Now includes text)
+            if (hitCollider.CompareTag("205CircuitBreaker") || hitCollider.CompareTag("201CircuitBreaker") ||
+                hitCollider.CompareTag("ICTCircuitBreaker") || hitCollider.CompareTag("ARCircuitBreaker"))
+            {
+                interactionText.text = "Press 'E' to flip Circuit Breaker";
+                interactionText.gameObject.SetActive(true);
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    if (hitCollider.CompareTag("205CircuitBreaker")) CircuitBreakers.instance.Activate205CB();
+                    else if (hitCollider.CompareTag("201CircuitBreaker")) CircuitBreakers.instance.Activate201CB();
+                    else if (hitCollider.CompareTag("ICTCircuitBreaker")) CircuitBreakers.instance.ActivateICTCB();
+                    else if (hitCollider.CompareTag("ARCircuitBreaker")) CircuitBreakers.instance.ActivateARCB();
+                }
+                return;
+            }
+
+
+            // 5. Lamesa (Placement Spot) Logic (Now positioned correctly, outside of pickup check)
+            if (hitCollider.CompareTag("Lamesa"))
+            {
+                if (IsHoldingItem(ItemType.FirstIpin))
+                {
+                    interactionText.text = "Press 'E' to Place 1st Ipin";
+                    interactionText.gameObject.SetActive(true);
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        bool placementSuccessful = LamesaNITagoNgirit.instance.TryPlace1stIpin(heldItemScript);
+
+                        if (placementSuccessful)
+                        {
+                            ConsumeHeldItem();
+                        }
+                    }
+                }
+                else if (IsHoldingItem(ItemType.SecondIpin))
+                {
+                    interactionText.text = "Press 'E' to Place 1st Ipin";
+                    interactionText.gameObject.SetActive(true);
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        bool placementSuccessful = LamesaNITagoNgirit.instance.TryPlace2ndIpin(heldItemScript);
+
+                        if (placementSuccessful)
+                        {
+                            ConsumeHeldItem();
+                        }
+                    }
+                }
+                else if (IsHoldingItem(ItemType.ThirdIpin))
+                {
+                    interactionText.text = "Press 'E' to Place 1st Ipin";
+                    interactionText.gameObject.SetActive(true);
+
+                    if (Input.GetKeyDown(KeyCode.E))
+                    {
+                        bool placementSuccessful = LamesaNITagoNgirit.instance.TryPlace3rdIpin(heldItemScript);
+
+                        if (placementSuccessful)
+                        {
+                            ConsumeHeldItem();
+                        }
+                    }
+                }
+                else
+                {
+                    interactionText.text = "Requires Ipin of Tago-Ngirit";
+                    interactionText.gameObject.SetActive(true);
+                }
+                return;
+            }
+
+
+            // --- C. PRIORITY 3: COMPONENT-BASED INTERACTIONS (Doors, Hiding Spots) ---
+
+            // 1. Regular Door Check
             DoorLock door = hitCollider.GetComponent<DoorLock>();
             if (door != null)
             {
@@ -211,8 +255,7 @@ public class PlayerRaycast : MonoBehaviour
                 return;
             }
 
-            // 3. Check if it's a FirstAndLastLock
-            // FIX: Removed redundant .collider
+            // 2. FirstAndLastLock Check
             FirstAndLastLock FLLock = hitCollider.GetComponent<FirstAndLastLock>();
             if (FLLock != null)
             {
@@ -234,7 +277,7 @@ public class PlayerRaycast : MonoBehaviour
                 return;
             }
 
-            // 4. Check if it's a HIDING SPOT
+            // 3. Hiding Spot Check
             HidingSpot spot = hitCollider.GetComponent<HidingSpot>();
             if (spot != null)
             {
@@ -296,6 +339,24 @@ public class PlayerRaycast : MonoBehaviour
         heldItemScript = null;
     }
 
+    void ConsumeHeldItem()
+    {
+        if (heldItemScript != null)
+        {
+            // 1. Store a temporary reference to the GameObject the player is holding
+            GameObject itemToDestroy = heldItemScript.gameObject;
+
+            // 2. CLEAR THE PLAYER'S HAND FIRST (MOST IMPORTANT STEP)
+            heldItemScript = null;
+
+            // 3. Destroy the physical item that was in the player's hand
+            Destroy(itemToDestroy);
+
+            // Hide UI
+            interactionText.gameObject.SetActive(false);
+        }
+    }
+
     void StartHiding(HidingSpot spot)
     {
         isHiding = true;
@@ -338,5 +399,12 @@ public class PlayerRaycast : MonoBehaviour
 
         currentSpot = null;
         interactionText.gameObject.SetActive(false);
+
+        // RE-ENABLE PLAYER CONTROLLER
+        if (playerController != null)
+        {
+            // Enable the controller after it's moved, often requires a brief delay.
+            playerController.enabled = true;
+        }
     }
 } // End of class
