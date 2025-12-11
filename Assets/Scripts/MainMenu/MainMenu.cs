@@ -1,50 +1,82 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement; // Required to change scenes
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections; 
 
 public class MainMenu : MonoBehaviour
 {
     [Header("Scene Configuration")]
-    [Tooltip("The exact name of the scene to load. Based on your GDD, this is likely 'Rooftop'.")]
     public string startingSceneName = "TRY Dark Scene";
 
     [Header("UI Panels")]
-    [Tooltip("Drag your Settings Panel GameObject here.")]
     public GameObject settingsPanel;
-
-    [Tooltip("Drag the Main Menu buttons container here (optional, to hide buttons when settings are open).")]
     public GameObject mainButtonsContainer;
 
-    [Header("Audio (Optional)")]
+    [Header("Loading Screen")]
+    [Tooltip("Drag your 'loadingscreencanvas' object here")]
+    public GameObject loadingScreenPanel;
+
+    [Tooltip("Optional: Drag a Slider here if you have a progress bar")]
+    public Slider loadingSlider;
+
+    [Header("Audio")]
     public AudioSource uiAudioSource;
     public AudioClip hoverSound;
     public AudioClip clickSound;
 
     private void Start()
     {
-        // Ensure settings are closed and cursor is visible when menu starts
+        // Ensure screens are in correct state on start
         if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (loadingScreenPanel != null) loadingScreenPanel.SetActive(false);
         if (mainButtonsContainer != null) mainButtonsContainer.SetActive(true);
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
-    // --- BUTTON FUNCTIONS ---
-
     public void PlayGame()
     {
         PlayClickSound();
-        // Load the game scene
-        SceneManager.LoadScene(startingSceneName);
+        // Start the loading coroutine instead of loading directly
+        StartCoroutine(LoadLevelAsync(startingSceneName));
     }
 
+    // --- THE LOADING LOGIC ---
+    IEnumerator LoadLevelAsync(string sceneName)
+    {
+        // 1. Show the Loading Screen
+        if (loadingScreenPanel != null)
+            loadingScreenPanel.SetActive(true);
+
+        // 2. Hide the Main Menu buttons so player can't click again
+        if (mainButtonsContainer != null)
+            mainButtonsContainer.SetActive(false);
+
+        // 3. Start loading the scene in the background
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+
+        // 4. Update the progress bar while loading
+        while (!operation.isDone)
+        {
+            // Unity loads from 0 to 0.9, then finishes. 
+            // We divide by 0.9 to get a clean 0 to 1 value.
+            float progress = Mathf.Clamp01(operation.progress / 0.9f);
+
+            // Update the slider (if you assigned one)
+            if (loadingSlider != null)
+            {
+                loadingSlider.value = progress;
+            }
+
+            yield return null; // Wait for the next frame
+        }
+    }
+
+    // --- STANDARD BUTTONS ---
     public void OpenSettings()
     {
         PlayClickSound();
-        // Show Settings, Hide Main Buttons
         if (settingsPanel != null) settingsPanel.SetActive(true);
         if (mainButtonsContainer != null) mainButtonsContainer.SetActive(false);
     }
@@ -52,7 +84,6 @@ public class MainMenu : MonoBehaviour
     public void CloseSettings()
     {
         PlayClickSound();
-        // Hide Settings, Show Main Buttons
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (mainButtonsContainer != null) mainButtonsContainer.SetActive(true);
     }
@@ -60,25 +91,22 @@ public class MainMenu : MonoBehaviour
     public void QuitGame()
     {
         PlayClickSound();
-        Debug.Log("User requested Quit. (Application.Quit only works in Build)");
         Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
-    // --- AUDIO FUNCTIONS ---
-    // Link this to the EventTrigger "PointerEnter" on your buttons
+    // --- AUDIO HELPERS ---
     public void PlayHoverSound()
     {
         if (uiAudioSource != null && hoverSound != null)
-        {
             uiAudioSource.PlayOneShot(hoverSound);
-        }
     }
 
     private void PlayClickSound()
     {
         if (uiAudioSource != null && clickSound != null)
-        {
             uiAudioSource.PlayOneShot(clickSound);
-        }
     }
 }
