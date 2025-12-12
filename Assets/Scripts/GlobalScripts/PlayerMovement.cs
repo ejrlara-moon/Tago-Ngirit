@@ -1,10 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using MelenitasDev.SoundsGood;
 
 public class PlayerMovement : MonoBehaviour
 {
     public static PlayerMovement instance;
+    private Sound walking = new Sound(SFX.walkingSFX).SetSpatialSound(false).SetVolume(0.1f);
+
+    [Header("Audio")]
+    public float baseStepSpeed = 0.5f; // Time between steps while walking
+    public float sprintStepMultiplier = 0.6f; // Makes steps faster (0.6 * 0.5 = 0.3s)
+    public float crouchStepMultiplier = 1.5f; // Makes steps slower
+    private float footstepTimer = 0;
+
+    [Header("Audio Variation")]
+    [Range(0.1f, 1f)] public float minVolume = 0.4f; // Minimum loudness
+    [Range(0.1f, 1f)] public float maxVolume = 0.6f; // Maximum loudness
+    [Range(0.8f, 1.2f)] public float minPitch = 0.9f; // Slightly lower pitch
+    [Range(0.8f, 1.2f)] public float maxPitch = 1.1f;
 
     [Header("Movement")]
     private float moveSpeed = 7f;
@@ -117,6 +132,8 @@ public class PlayerMovement : MonoBehaviour
         SpeedControl();
         StateHandler();
         ChangeFOVifSprinting();
+
+        HandleFootsteps();
 
         staminaBarUI.SetValue(stamina);
 
@@ -304,5 +321,48 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 GetSlopeMoveDirection()
     {
         return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
+    }
+
+    private void HandleFootsteps()
+    {
+        // Only play footsteps if Grounded AND we have input (WASD)
+        if (Grounded && (horizontalInput != 0 || verticalInput != 0))
+        {
+            footstepTimer -= Time.deltaTime;
+
+            if (footstepTimer <= 0)
+            {
+                // 1. Calculate Random Pitch (0.9 to 1.1 makes it sound organic)
+                float randomPitch = Random.Range(minPitch, maxPitch);
+
+                // 2. Calculate Random Volume (0.4 to 0.6 makes some steps lighter/heavier)
+                float randomVol = Random.Range(minVolume, maxVolume);
+
+                // 3. Apply settings and Play using Method Chaining
+                walking
+                    .SetPitch(randomPitch)
+                    .SetVolume(randomVol)
+                    .Play();
+
+                // 4. Reset timer based on current State
+                if (state == MovementState.sprinting)
+                {
+                    footstepTimer = baseStepSpeed * sprintStepMultiplier;
+                }
+                else if (state == MovementState.crouching)
+                {
+                    footstepTimer = baseStepSpeed * crouchStepMultiplier;
+                }
+                else
+                {
+                    footstepTimer = baseStepSpeed;
+                }
+            }
+        }
+        else
+        {
+            // Reset the timer so the sound plays immediately when you start moving again
+            footstepTimer = 0;
+        }
     }
 }

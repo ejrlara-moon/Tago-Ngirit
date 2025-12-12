@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MelenitasDev.SoundsGood;
 
 public class Flashlight : MonoBehaviour
 {
+    private Sound flashlightSFX = new Sound(SFX.flashLight).SetSpatialSound(false).SetVolume(0.1f);
+    
     [SerializeField] GameObject FlashlightLight;
     [SerializeField] Transform flashlightHolder;
     private bool FlashlightActive = false;
@@ -43,6 +46,7 @@ public class Flashlight : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
+            flashlightSFX.Play();
             if (FlashlightActive == false)
             {
                 if (currentBatteryLife > 0)

@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.melenitasdev.sounds-good": {
+      "version": "file:com.melenitasdev.sounds-good",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.textmeshpro": "3.0.7",
+        "com.unity.modules.uielements": "1.0.0"
+      }
+    },
     "com.unity.ai.navigation": {
       "version": "1.1.7",
       "depth": 0,
