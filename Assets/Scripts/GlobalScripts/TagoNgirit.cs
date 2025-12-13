@@ -9,7 +9,7 @@ public class TagoNgirit : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            AntagonistWatchingMechanic.instance.jumpScarePanel.SetActive(true);
+            AntagonistWatchingMechanic.instance.GameOver();
 
         }
     }

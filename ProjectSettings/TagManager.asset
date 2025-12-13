@@ -16,6 +16,8 @@ TagManager:
   - CodeLockForFacultyRoom
   - FirstKeyLock
   - Lamesa
+  - InternetRoomKey
+  - TagoNgirit
   layers:
   - Default
   - TransparentFX
@@ -25,7 +27,7 @@ TagManager:
   - UI
   - Interactable
   - CodeLock
-  - 
+  - TagoNgirit
   - 
   - 
   - 

@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,10 +10,11 @@ public class AntagonistWatchingMechanic : MonoBehaviour
     [SerializeField] GameObject Antagonist;
     float antagonistSpeedPanggulat = 50f;
     float antagonistAcelPanggulat = 35f;
-    
+
 
     [Header("SpawnPoints")]
     [SerializeField] Transform[] spawnPoints;
+    
 
     NavMeshAgent enemyAgent;
     Transform playerTransform;
@@ -25,6 +27,8 @@ public class AntagonistWatchingMechanic : MonoBehaviour
     int appearChance;
     int jumpScareChance;
     bool jumpScare;
+    public bool isPlayerHiding;
+    private Coroutine stopAndHideCoroutine;
 
     public GameObject jumpScarePanel;
 
@@ -34,6 +38,12 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 
     [Header("MiniJumpScares Variables")]
     bool miniJumpScare = false;
+
+    [Header("The Last Chase")]
+    public bool isFinalRun;
+    [SerializeField] Transform theLastChase;
+
+    private bool isPlayerCurrentlyLooking = false;
 
     void Awake()
     {
@@ -60,7 +70,7 @@ public class AntagonistWatchingMechanic : MonoBehaviour
         if (isChasingPlayer && playerTransform != null && Antagonist.activeSelf)
         {
             enemyAgent.SetDestination(playerTransform.position);
-            
+
         }
 
         if (isWatchingTimer == true && currentWatchingTimer > 0)
@@ -77,7 +87,7 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 
                 ChasePlayer();
 
-                
+
             }
             else if (PlayerRaycast.instance.isHiding == true && isWatchingTimer == true && jumpScare == true)
             {
@@ -91,7 +101,7 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 
                 }
             }
-            
+
         }
     }
 
@@ -131,9 +141,9 @@ public class AntagonistWatchingMechanic : MonoBehaviour
 
         Debug.Log("Tago-Ngirit will chase the player");
 
-        
-            isChasingPlayer = true;
-        
+
+        isChasingPlayer = true;
+
 
         if (enemyAgent != null)
         {
@@ -169,9 +179,114 @@ public class AntagonistWatchingMechanic : MonoBehaviour
         enemyAgent.speed = antagonistSpeedPanggulat;
         enemyAgent.acceleration = antagonistAcelPanggulat;
         Antagonist.SetActive(true);
-        
-        enemyAgent.SetDestination(pointB.position);
 
-        
+        enemyAgent.SetDestination(pointB.position);
+    }
+
+    public void GameOver()
+    {
+        jumpScarePanel.SetActive(true);
+        enemyAgent.isStopped =true;
+    }
+
+    public void StopMovingTagoNgiritWhenHide()
+    {
+
+        if (isFinalRun)
+        {
+            return;
+        }
+        // Start the stop and hide logic
+        if (enemyAgent != null && enemyAgent.isActiveAndEnabled)
+        {
+            enemyAgent.isStopped = true;
+        }
+
+        isPlayerHiding = true;
+
+        // Save the coroutine reference so it can be stopped later
+        stopAndHideCoroutine = StartCoroutine(DoDelayedHide());
+    }
+
+    private IEnumerator DoDelayedHide()
+    {
+        // Wait for the specified delay
+        yield return new WaitForSeconds(1f);
+
+        // After the wait, check if the state is still 'hiding' before hiding the enemy
+        if (isPlayerHiding)
+        {
+            Antagonist.SetActive(false);
+        }
+    }
+
+    public void TheLastChase()
+    {
+        Debug.Log("The last chase engage");
+        isFinalRun = true;
+        Antagonist.SetActive(true);
+        if (isFinalRun)
+        {
+            if (enemyAgent != null)
+            {
+                Antagonist.transform.position = theLastChase.position;
+                enemyAgent.isStopped = false;
+            }
+        }
+    }
+
+    public void ResumeMovingTagoNgiritWhenHide()
+    {
+        // 1. **Crucial:** Stop the delayed action if it's currently waiting.
+        if (stopAndHideCoroutine != null)
+        {
+            StopCoroutine(stopAndHideCoroutine);
+            stopAndHideCoroutine = null; // Clear the reference
+        }
+
+        if (enemyAgent != null && enemyAgent.isActiveAndEnabled && !isFinalRun)
+        {
+            // This line caused the error when the Antagonist GameObject was deactivated.
+            enemyAgent.isStopped = false;
+        }
+        // 2. Reset the state and resume movement
+        isPlayerHiding = false;
+        isWatchingTimer = false;
+        isChasingPlayer = false;
+        //Antagonist.SetActive(true); // Ensure the antagonist is active again
+    }
+
+    public void StopTagoNgiritWhenLook(bool islooked)
+    {
+        if (islooked)
+        {
+            if (!isPlayerHiding)
+            {
+                if (enemyAgent != null && enemyAgent.isActiveAndEnabled && !isFinalRun)
+                {
+                    if (isFinalRun) // If final run, do not stop.
+                    {
+                        return;
+                    }
+                    Debug.Log("stop tago ngirit");
+                    enemyAgent.isStopped = true;
+                }
+            }
+        }
+        else
+        {
+            if (!isPlayerHiding)
+            {
+                if (enemyAgent != null && enemyAgent.isActiveAndEnabled)
+                {
+                    if (isFinalRun) // If final run, do not stop.
+                    {
+                        return;
+                    }
+                    Debug.Log("Resume tago ngirit");
+                    enemyAgent.isStopped = false;
+                }
+            }
+        }
     }
 }

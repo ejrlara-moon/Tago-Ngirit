@@ -7,7 +7,7 @@ public class Wherefirstkey : MonoBehaviour
 
     [SerializeField] Transform[] randomFKSP; //FirstKeySpawnPoints
     [SerializeField] GameObject FirstKey;
-    [SerializeField] GameObject ForceField;
+
     public bool disableForceField;
 
     
@@ -29,9 +29,6 @@ public class Wherefirstkey : MonoBehaviour
         FirstKey.transform.position = randomFKSP[randomSP].position;
     }
 
-    public void ActivateForceFieild()
-    {
-        ForceField.SetActive(true);
-    }
+    
 
 }

@@ -12,5 +12,6 @@ public enum ItemType
     LastKey,
     FirstIpin,
     SecondIpin,
-    ThirdIpin
+    ThirdIpin,
+    InternetRoomKey
 }

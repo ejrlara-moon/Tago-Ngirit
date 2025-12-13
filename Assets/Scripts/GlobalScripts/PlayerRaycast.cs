@@ -72,7 +72,7 @@ public class PlayerRaycast : MonoBehaviour
             // NOTE: This check runs every frame, regardless of what the raycast hits.
             if (IsHoldingItem(ItemType.FirstKey) && Wherefirstkey.instance.disableForceField == false)
             {
-                Wherefirstkey.instance.ActivateForceFieild();
+                DisableForceField.instance.ActivateForceFieild();
             }
             // **********************************
 
@@ -81,8 +81,17 @@ public class PlayerRaycast : MonoBehaviour
             InteractableItem item = hitCollider.GetComponent<InteractableItem>();
             if (item != null && heldItemScript == null)
             {
-                interactionText.text = $"Press 'E' to pick up {item.itemName}";
-                interactionText.gameObject.SetActive(true);
+                if (hitCollider.CompareTag("InternetRoomKey") && DisableForceField.instance.isPlacedAll == false)
+                {
+                    Debug.Log("InternetKeyRoom is detected");
+                    interactionText.text = $"Press 'E' to pick up {item.itemName}";
+                    interactionText.gameObject.SetActive(false);
+                }
+                else
+                {
+                    interactionText.text = $"Press 'E' to pick up {item.itemName}";
+                    interactionText.gameObject.SetActive(true);
+                }
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
@@ -141,17 +150,11 @@ public class PlayerRaycast : MonoBehaviour
                         else if (hitCollider.CompareTag("Monitor2")) pcInstance.EngageToPC2();
                         else if (hitCollider.CompareTag("Monitor3")) pcInstance.EngageToPC3();
                         else if (hitCollider.CompareTag("Monitor4")) pcInstance.EngageToPC4();
+
+                        interactionText.gameObject.SetActive(false);
                     }
                 }
-                else if (hitCollider.CompareTag("Monitor") && pcInstance.isPC1 ||
-                         hitCollider.CompareTag("Monitor2") && pcInstance.isPC2 ||
-                         hitCollider.CompareTag("Monitor3") && pcInstance.isPC3 ||
-                         hitCollider.CompareTag("Monitor4") && pcInstance.isPC4)
-                {
-                    // Already engaged, perhaps show a different message or skip
-                    interactionText.text = "PC is in use";
-                    interactionText.gameObject.SetActive(true);
-                }
+                
                 return;
             }
 
@@ -230,11 +233,25 @@ public class PlayerRaycast : MonoBehaviour
                 return;
             }
 
+            if (IsHoldingItem(ItemType.AntingAnting))
+            {
+                PlayerRaycast2.instance.ActivateRaycast();
+            }
+            else
+            {
+                PlayerRaycast2.instance.DeactivateRaycast();
+            }
 
-            // --- C. PRIORITY 3: COMPONENT-BASED INTERACTIONS (Doors, Hiding Spots) ---
+            if (IsHoldingItem(ItemType.LastKey))
+            {
+                AntagonistWatchingMechanic.instance.TheLastChase();
+            }
 
-            // 1. Regular Door Check
-            DoorLock door = hitCollider.GetComponent<DoorLock>();
+
+                // --- C. PRIORITY 3: COMPONENT-BASED INTERACTIONS (Doors, Hiding Spots) ---
+
+                // 1. Regular Door Check
+                DoorLock door = hitCollider.GetComponent<DoorLock>();
             if (door != null)
             {
                 if (door.isLocked)
@@ -251,6 +268,27 @@ public class PlayerRaycast : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     door.TryUnlock(heldItemScript);
+                }
+                return;
+            }
+
+            SingleDoorLock singledoor = hitCollider.GetComponent<SingleDoorLock>();
+            if (singledoor != null)
+            {
+                if (singledoor.isLocked)
+                {
+                    string requiredKeyName = singledoor.requiredKeyType.ToString();
+                    interactionText.text = $"{singledoor.doorName} is locked. Requires {requiredKeyName}.";
+                }
+                else
+                {
+                    interactionText.text = $"Press 'E' to open {singledoor.doorName}";
+                }
+                interactionText.gameObject.SetActive(true);
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    singledoor.TryUnlock(heldItemScript);
                 }
                 return;
             }
@@ -359,8 +397,10 @@ public class PlayerRaycast : MonoBehaviour
 
     void StartHiding(HidingSpot spot)
     {
+        AntagonistWatchingMechanic.instance.StopMovingTagoNgiritWhenHide();
         isHiding = true;
         currentSpot = spot;
+        
 
         if (playerMovement != null) { playerMovement.enabled = false; }
         // if (playerCam != null) { playerCam.enabled = false; } // Your original script commented this out
@@ -376,10 +416,13 @@ public class PlayerRaycast : MonoBehaviour
         {
             heldItemScript.gameObject.SetActive(false);
         }
+
+        
     }
 
     void StopHiding()
     {
+        AntagonistWatchingMechanic.instance.ResumeMovingTagoNgiritWhenHide(); 
         isHiding = false;
 
         if (playerController != null)
@@ -406,5 +449,7 @@ public class PlayerRaycast : MonoBehaviour
             // Enable the controller after it's moved, often requires a brief delay.
             playerController.enabled = true;
         }
+
+        
     }
 } // End of class
