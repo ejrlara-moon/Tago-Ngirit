@@ -24,6 +24,8 @@ public class PlayerRaycast : MonoBehaviour
 
     private InteractableItem heldItemScript = null;
 
+    bool onlyOne;
+
     void Awake()
     {
         instance = this;
@@ -33,6 +35,17 @@ public class PlayerRaycast : MonoBehaviour
 
     void Update()
     {
+        if (IsHoldingItem(ItemType.LastKey))
+        {
+            if (!onlyOne)
+            {
+                TheLastChase.instance.EngageTheLastChase(true);
+                onlyOne = true;
+            }
+
+            
+        }
+
         // 1. HIDING STATE CHECK
         if (isHiding)
         {
@@ -242,10 +255,7 @@ public class PlayerRaycast : MonoBehaviour
                 PlayerRaycast2.instance.DeactivateRaycast();
             }
 
-            if (IsHoldingItem(ItemType.LastKey))
-            {
-                AntagonistWatchingMechanic.instance.TheLastChase();
-            }
+            
 
 
                 // --- C. PRIORITY 3: COMPONENT-BASED INTERACTIONS (Doors, Hiding Spots) ---

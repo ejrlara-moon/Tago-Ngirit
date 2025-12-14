@@ -39,10 +39,6 @@ public class AntagonistWatchingMechanic : MonoBehaviour
     [Header("MiniJumpScares Variables")]
     bool miniJumpScare = false;
 
-    [Header("The Last Chase")]
-    public bool isFinalRun;
-    [SerializeField] Transform theLastChase;
-
     private bool isPlayerCurrentlyLooking = false;
 
     void Awake()
@@ -186,16 +182,17 @@ public class AntagonistWatchingMechanic : MonoBehaviour
     public void GameOver()
     {
         jumpScarePanel.SetActive(true);
-        enemyAgent.isStopped =true;
+
+        if (enemyAgent == null)
+        {
+            enemyAgent.isStopped = true;
+        }
+
+        
     }
 
     public void StopMovingTagoNgiritWhenHide()
     {
-
-        if (isFinalRun)
-        {
-            return;
-        }
         // Start the stop and hide logic
         if (enemyAgent != null && enemyAgent.isActiveAndEnabled)
         {
@@ -220,21 +217,6 @@ public class AntagonistWatchingMechanic : MonoBehaviour
         }
     }
 
-    public void TheLastChase()
-    {
-        Debug.Log("The last chase engage");
-        isFinalRun = true;
-        Antagonist.SetActive(true);
-        if (isFinalRun)
-        {
-            if (enemyAgent != null)
-            {
-                Antagonist.transform.position = theLastChase.position;
-                enemyAgent.isStopped = false;
-            }
-        }
-    }
-
     public void ResumeMovingTagoNgiritWhenHide()
     {
         // 1. **Crucial:** Stop the delayed action if it's currently waiting.
@@ -244,7 +226,7 @@ public class AntagonistWatchingMechanic : MonoBehaviour
             stopAndHideCoroutine = null; // Clear the reference
         }
 
-        if (enemyAgent != null && enemyAgent.isActiveAndEnabled && !isFinalRun)
+        if (enemyAgent != null && enemyAgent.isActiveAndEnabled)
         {
             // This line caused the error when the Antagonist GameObject was deactivated.
             enemyAgent.isStopped = false;
@@ -262,12 +244,8 @@ public class AntagonistWatchingMechanic : MonoBehaviour
         {
             if (!isPlayerHiding)
             {
-                if (enemyAgent != null && enemyAgent.isActiveAndEnabled && !isFinalRun)
+                if (enemyAgent != null && enemyAgent.isActiveAndEnabled)
                 {
-                    if (isFinalRun) // If final run, do not stop.
-                    {
-                        return;
-                    }
                     Debug.Log("stop tago ngirit");
                     enemyAgent.isStopped = true;
                 }
@@ -279,10 +257,6 @@ public class AntagonistWatchingMechanic : MonoBehaviour
             {
                 if (enemyAgent != null && enemyAgent.isActiveAndEnabled)
                 {
-                    if (isFinalRun) // If final run, do not stop.
-                    {
-                        return;
-                    }
                     Debug.Log("Resume tago ngirit");
                     enemyAgent.isStopped = false;
                 }
